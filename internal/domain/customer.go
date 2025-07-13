@@ -24,6 +24,12 @@ type LoginRequest struct {
 	Password string `json:"password" validate:"required,min=8,max=72,excludesall= "`
 }
 
+type LoginResponse struct {
+	Email        string `json:"email"`
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+}
+
 // BeforeCreate will set a UUID rather than numeric ID.
 func (c *Customer) BeforeCreate(tx *gorm.DB) (err error) {
 	c.UniqueIdentifier = uuid.NewString()
