@@ -6,7 +6,7 @@ import (
 	"log"
 )
 
-func main() {
+func RunMigration() {
 	db := config.GetDB()
 
 	// Auto migrate models
