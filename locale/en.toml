@@ -1,7 +1,7 @@
 [validation]
 required = "{{.field}} is required"
 email = "Invalid email format"
-min = "{{.field}} must be at least {[.param}} characters"
+min = "{{.field}} must be at least {{.param}} characters"
 max = "{{.field}} must be at most {{.param}} characters"
 password_complexity = "Password must contain uppercase, lowercase, number, and special character"
 
