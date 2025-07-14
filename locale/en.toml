@@ -12,5 +12,7 @@ updated = "User updated successfully"
 deleted = "User deleted successfully"
 listed = "Users retrieved successfully"
 not_found = "User not found"
-email_exists = "Email already exists"
-invalid_id = "Invalid user ID"
+password-miss-match = "Password wrong"
+
+[general]
+token_failed = "Failed create token"

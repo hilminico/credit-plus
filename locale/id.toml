@@ -12,6 +12,7 @@ updated = "User berhasil diupdate"
 deleted = "User berhasil dihapus"
 listed = "Users berhasil didapatkan"
 not_found = "User tidak ditemukan"
-email_exists = "Email sudah ada"
-invalid_id = "user ID salah"
+password-miss-match = "Password salah"
 
+[general]
+token_failed = "Gagal membuat token"
