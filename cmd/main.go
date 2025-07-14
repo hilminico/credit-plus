@@ -7,6 +7,8 @@ import (
 	"creditPlus/internal/interface/handler"
 	"creditPlus/internal/repository"
 	"creditPlus/internal/usecase"
+	"creditPlus/migration"
+	"creditPlus/seeder"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"os"
@@ -37,6 +39,10 @@ func main() {
 			return next(c)
 		}
 	})
+
+	migration.RunMigration()
+
+	seeder.RunSeeder()
 
 	// Initialize database
 	db := config.GetDB()
@@ -71,5 +77,5 @@ func main() {
 	}
 
 	// Start server
-	e.Logger.Fatal(e.Start(":" + os.Getenv("SERVER_PORT")))
+	e.Logger.Fatal(e.Start(":" + os.Getenv("PORT")))
 }
