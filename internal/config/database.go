@@ -10,6 +10,8 @@ import (
 	"time"
 )
 
+const maxAttempts = 10
+
 var (
 	db     *gorm.DB
 	dbOnce sync.Once
@@ -27,26 +29,33 @@ func GetDB() *gorm.DB {
 		)
 
 		var err error
-		db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
-			NowFunc: func() time.Time {
-				return time.Now().UTC()
-			},
-		})
-		if err != nil {
-			log.Fatalf("Failed to connect to database: %v", err)
+
+		for attempt := 1; attempt <= maxAttempts; attempt++ {
+			db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
+				NowFunc: func() time.Time {
+					return time.Now().UTC()
+				},
+			})
+
+			if err == nil {
+				sqlDB, err := db.DB()
+				if err == nil {
+					err = sqlDB.Ping()
+					if err == nil {
+						log.Println("Successfully connected to MySQL!")
+						// Set connection pool settings
+						sqlDB.SetMaxIdleConns(10)
+						sqlDB.SetMaxOpenConns(100)
+						sqlDB.SetConnMaxLifetime(time.Hour)
+
+						break
+					}
+				}
+			}
+
+			log.Printf("Attempt %d/%d: Connection failed (%v), retrying in 5 seconds...", attempt, maxAttempts, err)
+			time.Sleep(5 * time.Second)
 		}
-
-		sqlDB, err := db.DB()
-		if err != nil {
-			log.Fatalf("Failed to get SQL DB: %v", err)
-		}
-
-		// Set connection pool settings
-		sqlDB.SetMaxIdleConns(10)
-		sqlDB.SetMaxOpenConns(100)
-		sqlDB.SetConnMaxLifetime(time.Hour)
-
-		fmt.Println("MySQL database connection established")
 	})
 	return db
 }

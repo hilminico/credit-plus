@@ -25,9 +25,8 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	Email        string `json:"email"`
-	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
+	Email    string      `json:"email"`
+	JwtToken interface{} `json:"jwt_token"`
 }
 
 // BeforeCreate will set a UUID rather than numeric ID.
