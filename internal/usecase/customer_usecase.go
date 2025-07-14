@@ -74,6 +74,8 @@ func (s *CustomerService) UpdateCustomerDetail(ctx context.Context, id string, u
 		return nil, err
 	}
 
+	date, _ := time.Parse("2006-01-02 15:04:05", updateData.DateBirth)
+
 	if customerDetail.ID == 0 {
 		err := s.customerDetailRepo.Create(ctx, &domain.CustomerDetail{
 			CustomerId:   id,
@@ -81,7 +83,7 @@ func (s *CustomerService) UpdateCustomerDetail(ctx context.Context, id string, u
 			FullName:     updateData.FullName,
 			LegalName:    updateData.LegalName,
 			PlaceOfBirth: updateData.PlaceOfBirth,
-			DateBirth:    updateData.DateBirth,
+			DateBirth:    date,
 			Salary:       updateData.Salary,
 			ImageKtp:     updateData.ImageKtp,
 			ImageSelf:    updateData.ImageSelf,
@@ -95,7 +97,7 @@ func (s *CustomerService) UpdateCustomerDetail(ctx context.Context, id string, u
 		customerDetail.FullName = updateData.FullName
 		customerDetail.LegalName = updateData.LegalName
 		customerDetail.PlaceOfBirth = updateData.PlaceOfBirth
-		customerDetail.DateBirth = updateData.DateBirth
+		customerDetail.DateBirth = date
 		customerDetail.Salary = updateData.Salary
 		customerDetail.ImageKtp = updateData.ImageKtp
 		customerDetail.ImageSelf = updateData.ImageSelf
