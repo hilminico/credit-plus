@@ -35,3 +35,25 @@ func (r *CustomerRepository) FindByEmail(ctx context.Context, email string) (*do
 		return nil, err
 	}
 }
+
+func (r *CustomerRepository) FindByID(ctx context.Context, id string) (*domain.Customer, error) {
+	resultChan := make(chan *domain.Customer)
+	errChan := make(chan error, 1)
+
+	go func() {
+		var customer domain.Customer
+		err := r.db.WithContext(ctx).Preload("CustomerDetail").Where("unique_identifier = ?", id).First(&customer).Error
+		if err != nil {
+			errChan <- err
+			return
+		}
+		resultChan <- &customer
+	}()
+
+	select {
+	case user := <-resultChan:
+		return user, nil
+	case err := <-errChan:
+		return nil, err
+	}
+}
