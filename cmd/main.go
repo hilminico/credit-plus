@@ -7,6 +7,7 @@ import (
 	"creditPlus/internal/interface/handler"
 	"creditPlus/internal/repository"
 	"creditPlus/internal/usecase"
+	"creditPlus/middlewares"
 	"creditPlus/migration"
 	"creditPlus/seeder"
 	"github.com/labstack/echo/v4"
@@ -23,22 +24,8 @@ func main() {
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORS())
 
-	// multi language
-	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			// set default id lang
-			lang := "en"
-
-			if c.Request().Header.Get("Accept-Language") != "" {
-				lang = c.Request().Header.Get("Accept-Language")
-			}
-
-			ctx := localization.WithLanguage(c.Request().Context(), lang)
-			c.SetRequest(c.Request().WithContext(ctx))
-
-			return next(c)
-		}
-	})
+	// multi language fetch from header
+	e.Use(middlewares.WithLocalization())
 
 	migration.RunMigration()
 
@@ -49,7 +36,8 @@ func main() {
 
 	// Initialize repository, service, and controller user
 	customerRepo := repository.NewCustomerRepository(db)
-	customerService := usecase.NewCustomerService(customerRepo)
+	customerDetailRepo := repository.NewCustomerDetailRepository(db)
+	customerService := usecase.NewCustomerService(customerRepo, customerDetailRepo)
 	customerController := handler.NewCustomerController(customerService)
 
 	// Validation
@@ -63,17 +51,17 @@ func main() {
 	// Routes
 	api := e.Group("/api/v1")
 	{
-		api.POST("/customer/login", customerController.Login)
+		api.POST("/login", customerController.Login)
 
-		//// user route
-		//api.POST("/users", userController.CreateUser)
-		//api.GET("/users", userController.GetAllUsers)
-		//api.GET("/users/:id", userController.GetUser)
-		//api.PUT("/users/:id", userController.UpdateUser)
-		//
-		//// user route
-		//api.POST("/login", authController.Login)
-		//api.POST("/register", authController.Register)
+		// Restricted group
+		restricted := api.Group("/customer")
+
+		// Configure middleware with the custom claims type
+		restricted.Use(middlewares.AuthWithConfig(middlewares.DefaultAuthConfig(db)))
+
+		restricted.GET("/profile", customerController.Show)
+		restricted.PATCH("/", customerController.Update)
+
 	}
 
 	// Start server
