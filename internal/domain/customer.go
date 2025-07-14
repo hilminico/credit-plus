@@ -2,6 +2,7 @@ package domain
 
 import (
 	"errors"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -15,10 +16,15 @@ type Customer struct {
 	UniqueIdentifier string `gorm:"type:char(36);"`
 	Email            string `gorm:"not null;unique"`
 	Password         string
-	CreatedAt        time.Time `gorm:"autoCreateTime"`
-	UpdatedAt        time.Time `gorm:"autoUpdateTime"`
+	CreatedAt        time.Time      `gorm:"autoCreateTime"`
+	UpdatedAt        time.Time      `gorm:"autoUpdateTime"`
+	CustomerDetail   CustomerDetail `gorm:"-:migration;foreignKey:CustomerId;references:UniqueIdentifier"`
 }
 
+type CustomerClaims struct {
+	UniqueIdentifier string `json:"unique_identifier"`
+	jwt.RegisteredClaims
+}
 type LoginRequest struct {
 	Email    string `json:"email" validate:"required,email,max=255"`
 	Password string `json:"password" validate:"required,min=8,max=72,excludesall= "`
