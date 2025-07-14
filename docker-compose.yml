@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "11000:8080"
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=secret
+      - DB_NAME=credit-plus
+      - PORT=8080
+      - SECRET_KEY=production
+    depends_on:
+      - db
+    volumes:
+      - ./locale:/app/locale
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "http://localhost:11000/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+  db:
+    image: mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=secret
+      - MYSQL_DATABASE=credit-plus
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "11001:3306"
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      timeout: 20s
+      retries: 10
+
+volumes:
+  mysql_data:
