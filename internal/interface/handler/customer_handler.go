@@ -24,14 +24,43 @@ func (c *CustomerController) Login(ctx echo.Context) error {
 		return response.ErrorResponseValidation(ctx, validationErrors)
 	}
 
-	loginResponse, err := c.customerService.Login(ctx.Request().Context(), &domain.LoginRequest{
-		Email:    customerRequest.Email,
-		Password: customerRequest.Password,
-	})
+	loginResponse, err := c.customerService.Login(
+		ctx.Request().Context(),
+		&domain.LoginRequest{
+			Email:    customerRequest.Email,
+			Password: customerRequest.Password,
+		})
 
 	if err != nil {
 		return response.ErrorResponse(ctx, http.StatusInternalServerError, err.Error(), nil)
 	}
 
 	return response.SuccessResponse(ctx, http.StatusCreated, "auth.created", loginResponse)
+}
+
+func (c *CustomerController) Show(ctx echo.Context) error {
+	customer := ctx.Get("customer").(*domain.Customer)
+
+	user, err := c.customerService.GetCustomer(ctx.Request().Context(), customer.UniqueIdentifier)
+	if err != nil {
+		return response.ErrorResponse(ctx, http.StatusNotFound, "user.not_found", nil)
+	}
+
+	return response.SuccessResponse(ctx, http.StatusOK, "user.retrieved", user)
+}
+
+func (c *CustomerController) Update(ctx echo.Context) error {
+	customer := ctx.Get("customer").(*domain.Customer)
+
+	var updateData domain.CustomerDetailRequest
+	if err := ctx.Bind(&updateData); err != nil {
+		return response.ErrorResponse(ctx, http.StatusBadRequest, "Invalid request payload", nil)
+	}
+
+	customerDetail, err := c.customerService.UpdateCustomerDetail(ctx.Request().Context(), customer.UniqueIdentifier, &updateData)
+	if err != nil {
+		return response.ErrorResponse(ctx, http.StatusInternalServerError, err.Error(), nil)
+	}
+
+	return response.SuccessResponse(ctx, http.StatusOK, "user.updated", customerDetail)
 }
