@@ -12,7 +12,7 @@ type Seeder struct {
 	db *gorm.DB
 }
 
-func main() {
+func RunSeeder() {
 	seeder := NewSeeder()
 	seeder.Run()
 }
@@ -40,7 +40,7 @@ func (s *Seeder) SeedCustomer() {
 	customers := []domain.Customer{
 		{
 			Email:    "test@gmail.com",
-			Password: "test123",
+			Password: "test1234",
 		},
 	}
 
