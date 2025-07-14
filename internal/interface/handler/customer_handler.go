@@ -35,7 +35,7 @@ func (c *CustomerController) Login(ctx echo.Context) error {
 		return response.ErrorResponse(ctx, http.StatusInternalServerError, err.Error(), nil)
 	}
 
-	return response.SuccessResponse(ctx, http.StatusCreated, "auth.created", loginResponse)
+	return response.SuccessResponse(ctx, http.StatusCreated, "customer.login", loginResponse)
 }
 
 func (c *CustomerController) Show(ctx echo.Context) error {
@@ -43,18 +43,18 @@ func (c *CustomerController) Show(ctx echo.Context) error {
 
 	user, err := c.customerService.GetCustomer(ctx.Request().Context(), customer.UniqueIdentifier)
 	if err != nil {
-		return response.ErrorResponse(ctx, http.StatusNotFound, "user.not_found", nil)
+		return response.ErrorResponse(ctx, http.StatusNotFound, "customer.not_found", nil)
 	}
 
-	return response.SuccessResponse(ctx, http.StatusOK, "user.retrieved", user)
+	return response.SuccessResponse(ctx, http.StatusOK, "customer.retrieved", user)
 }
 
 func (c *CustomerController) Update(ctx echo.Context) error {
 	customer := ctx.Get("customer").(*domain.Customer)
 
 	var updateData domain.CustomerDetailRequest
-	if err := ctx.Bind(&updateData); err != nil {
-		return response.ErrorResponse(ctx, http.StatusBadRequest, "Invalid request payload", nil)
+	if validationErrors := validation.ValidateRequest(ctx, &updateData); len(validationErrors) > 0 {
+		return response.ErrorResponseValidation(ctx, validationErrors)
 	}
 
 	customerDetail, err := c.customerService.UpdateCustomerDetail(ctx.Request().Context(), customer.UniqueIdentifier, &updateData)
@@ -62,5 +62,5 @@ func (c *CustomerController) Update(ctx echo.Context) error {
 		return response.ErrorResponse(ctx, http.StatusInternalServerError, err.Error(), nil)
 	}
 
-	return response.SuccessResponse(ctx, http.StatusOK, "user.updated", customerDetail)
+	return response.SuccessResponse(ctx, http.StatusOK, "customer.updated", customerDetail)
 }

@@ -5,13 +5,12 @@ min = "{{.field}} harus minimal {{.param}} karakter"
 max = "{{.field}} harus maksimal {{.param}} karakter"
 password_complexity = "password harus mengandung huruf besar, huruf kecil, angka, dan spesial karakter"
 
+
 [customer]
-created = "User berhasil dibuat"
-retrieved = "User berhasil didapatkan"
-updated = "User berhasil diupdate"
-deleted = "User berhasil dihapus"
-listed = "Users berhasil didapatkan"
-not_found = "User tidak ditemukan"
+login = "Customer successfully login"
+not_found = "Customer tidak ditemukan"
+retrieved = "Customer berhasil didapatkan"
+updated = "Customer berhasil diupdate"
 password-miss-match = "Password salah"
 
 [general]

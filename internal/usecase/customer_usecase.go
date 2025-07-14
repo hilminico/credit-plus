@@ -49,6 +49,9 @@ func (s *CustomerService) Login(ctx context.Context, LoginRequest *domain.LoginR
 	tokenJwt := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	token, err := tokenJwt.SignedString([]byte(os.Getenv("SECRET_KEY")))
+	if err != nil {
+		return nil, errors.New("general.token_failed")
+	}
 
 	return &domain.LoginResponse{
 		Email:    customer.Email,
